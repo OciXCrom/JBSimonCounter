@@ -1,0 +1,56 @@
+[en]
+JBTIMER_CHAT_PREFIX = &x04[JB Timer]&x01
+JBTIMER_NOT_SIMON = Only &x04Simon &x01can use this command!
+JBTIMER_INVALID_TIMER = Invalid timer argument &x04"%s"
+JBTIMER_INVALID_NUMBER = You can't activate the timer for &x04%s second(s)
+JBTIMER_USAGE = Usage: &x04%s <seconds> [speed]
+JBTIMER_ALREADY_ACTIVE = The timer is active at the moment! &x04%i seconds &x01remaining.
+JBTIMER_STARTED = &x03%s &x01has started the timer for &x04%i seconds&x01.
+JBTIMER_STARTED_SPEED = &x03%s &x01has started the timer for &x04%i seconds &x01with &x04%.1f speed&x01.
+JBTIMER_DISPLAY = < Timer: %i %L >
+JBTIMER_NOT_ACTIVE = The timer is not active!
+JBTIMER_NO_ACCESS = You have no access to this command.
+JBTIMER_STOPPED = &x03%s &x01has stopped the timer!
+JBTIMER_TIMER_END = The time has ended!
+JBTIMER_RELOADED = You have reloaded the configuration.
+JBTIMER_RELOADED_LOG = %s has reloaded the configuration.
+JBTIMER_SECOND = Second
+JBTIMER_SECONDS = Seconds
+
+[mk]
+JBTIMER_CHAT_PREFIX = &x04[JB Tajmer]&x01
+JBTIMER_NOT_SIMON = Samo &x04Simon &x01mozhe da ja koristi ovaa komanda!
+JBTIMER_INVALID_TIMER = Nevaliden argument &x04"%s"
+JBTIMER_INVALID_NUMBER = Ne mozhesh da go aktivirash tajmerot za &x04%s sekundi
+JBTIMER_USAGE = Upotreba: &x04%s <sekundi> [brzina]
+JBTIMER_ALREADY_ACTIVE = Tajmerot momentalno e aktiven! Preostanuvaat &x04%i &x01sekundi.
+JBTIMER_STARTED = &x03%s &x01go startira tajmerot za &x04%i sekundi&x01.
+JBTIMER_STARTED_SPEED = &x03%s &x01go startira tajmerot za &x04%i sekundi &x01so brzina &x04%.1f&x01.
+JBTIMER_DISPLAY = < Tajmer: %i %L >
+JBTIMER_NOT_ACTIVE = Tajmerot ne e atkiven!
+JBTIMER_NO_ACCESS = Nemash dostap do ovaa komanda.
+JBTIMER_STOPPED = &x03%s &x01go zapra tajmerot!
+JBTIMER_TIMER_END = Tajmerot zavrshi!
+JBTIMER_RELOADED = Konfiguracijata e obnovena.
+JBTIMER_RELOADED_LOG = %s ja obnovi konfiguracijata.
+JBTIMER_SECOND = Sekunda
+JBTIMER_SECONDS = Sekundi
+
+[bg]
+JBTIMER_CHAT_PREFIX = &x04[JB Taimer]&x01
+JBTIMER_NOT_SIMON = Samo &x04Simon &x01moje da polzva tazi komanda!
+JBTIMER_INVALID_TIMER = Nevaliden argument &x04"%s"
+JBTIMER_INVALID_NUMBER = Ne mojsh da aktivirash taimera za &x04%s sekundi
+JBTIMER_USAGE = Upotreba: &x04%s <sekundi> [skorost]
+JBTIMER_ALREADY_ACTIVE = Taimerut e aktiven v momenta! Ostavat &x04%i &x01sekundi.
+JBTIMER_STARTED = &x03%s &x01startira taimera za &x04%i sekundi&x01.
+JBTIMER_STARTED_SPEED = &x03%s &x01startira taimera za &x04%i sekundi &x01sus skorost &x04%.1f&x01.
+JBTIMER_DISPLAY = < Taimer: %i %L >
+JBTIMER_NOT_ACTIVE = Taimerut ne e atkiven!
+JBTIMER_NO_ACCESS = Nqmash dostup do tazi komanda.
+JBTIMER_STOPPED = &x03%s &x01sprq taimera!
+JBTIMER_TIMER_END = Taimerut svurshi!
+JBTIMER_RELOADED = Konfiguraciqta e prezaredena.
+JBTIMER_RELOADED_LOG = %s prezaredi konfiguraciqta.
+JBTIMER_SECOND = Sekunda
+JBTIMER_SECONDS = Sekundi
