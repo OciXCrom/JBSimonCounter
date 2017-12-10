@@ -13,7 +13,7 @@
 native is_user_simon(id)
 #define IS_SIMON(%1) is_user_simon(%1)
 
-#define PLUGIN_VERSION "1.0"
+#define PLUGIN_VERSION "1.0.1"
 #define TASK_TIMER 433987
 #define SYM_ETC "..."
 #define PLUGIN_TIMER g_eSettings[HIDE_COMMAND_IN_CHAT]
@@ -261,7 +261,9 @@ public OnSay(id)
 				}
 					
 				DisplayTimer()
-				set_task(fSpeed ? fSpeed : g_eSettings[TIMER_SPEED], "DisplayTimer", TASK_TIMER, .flags = "b")
+				
+				if(g_iTimer > 1)
+					set_task(fSpeed ? fSpeed : g_eSettings[TIMER_SPEED], "DisplayTimer", TASK_TIMER, .flags = "b")
 			}
 		}
 		case CMD_STOP:
