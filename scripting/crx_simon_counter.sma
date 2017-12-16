@@ -13,7 +13,7 @@
 native is_user_simon(id)
 #define IS_SIMON(%1) is_user_simon(%1)
 
-#define PLUGIN_VERSION "1.0.1"
+#define PLUGIN_VERSION "1.0.2"
 #define TASK_TIMER 433987
 #define SYM_ETC "..."
 #define PLUGIN_TIMER g_eSettings[HIDE_COMMAND_IN_CHAT]
@@ -49,6 +49,7 @@ enum _:Settings
 new g_eSettings[Settings]
 
 new Trie:g_tTimer,
+	Float:g_fSpeed,
 	g_iCmdLen[3],
 	g_iObject,
 	g_iTimer
@@ -248,22 +249,21 @@ public OnSay(id)
 			else
 			{
 				g_iTimer = str_to_num(szTime)
+				g_fSpeed = szSpeed[0] ? str_to_float(szSpeed) : g_eSettings[TIMER_SPEED]
 				
-				new szName[32], Float:fSpeed = str_to_float(szSpeed)
+				new szName[32]
 				get_user_name(id, szName, charsmax(szName))
 				
 				if(g_eSettings[CHAT_MESSAGES])
 				{
-					if(fSpeed)
-						CC_SendMessage(0, "%L", LANG_PLAYER, "JBTIMER_STARTED_SPEED", szName, g_iTimer, fSpeed)
+					if(g_fSpeed != g_eSettings[TIMER_SPEED])
+						CC_SendMessage(0, "%L", LANG_PLAYER, "JBTIMER_STARTED_SPEED", szName, g_iTimer, g_fSpeed)
 					else
 						CC_SendMessage(0, "%L", LANG_PLAYER, "JBTIMER_STARTED", szName, g_iTimer)
 				}
-					
-				DisplayTimer()
 				
-				if(g_iTimer > 1)
-					set_task(fSpeed ? fSpeed : g_eSettings[TIMER_SPEED], "DisplayTimer", TASK_TIMER, .flags = "b")
+				set_task(g_fSpeed, "DisplayTimer", TASK_TIMER, .flags = "b")
+				DisplayTimer()
 			}
 		}
 		case CMD_STOP:
@@ -315,9 +315,14 @@ public DisplayTimer()
 	if(!--g_iTimer)
 	{
 		remove_task(TASK_TIMER)
-		CC_SendMessage(0, "%L", LANG_PLAYER, "JBTIMER_TIMER_END")
+		
+		if(g_eSettings[CHAT_MESSAGES])
+			set_task(g_fSpeed, "StopMessage")
 	}
 }
+
+public StopMessage()
+	CC_SendMessage(0, "%L", LANG_PLAYER, "JBTIMER_TIMER_END")
 
 public StopTimer()
 {
