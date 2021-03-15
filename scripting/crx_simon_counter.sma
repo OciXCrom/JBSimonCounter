@@ -1,9 +1,18 @@
 #include <amxmodx>
 #include <amxmisc>
-#include <cromchat>
 
-#if AMXX_VERSION_NUM < 183
-	#include <dhudmessage>
+#tryinclude <cromchat>
+
+#if !defined _cromchat_included
+	#error "cromchat.inc" is missing in your "scripting/include" folder. Download it from: "https://amxx-bg.info/inc/"
+#endif
+
+#if AMXX_VERSION_NUM < 183 || !defined set_dhudmessage
+	#tryinclude <dhudmessage>
+
+	#if !defined _dhudmessage_included
+		#error "dhudmessage.inc" is missing in your "scripting/include" folder. Download it from: "https://amxx-bg.info/inc/"
+	#endif
 #endif
 
 /*	
@@ -13,17 +22,19 @@
 native is_user_simon(id)
 #define IS_SIMON(%1) is_user_simon(%1)
 
-#define PLUGIN_VERSION "1.0.2"
-#define TASK_TIMER 433987
-#define SYM_ETC "..."
-#define PLUGIN_TIMER g_eSettings[HIDE_COMMAND_IN_CHAT]
+new const PLUGIN_VERSION[] = "1.2"
+
+const TASK_TIMER = 433987
+new const SYM_ETC[] = "..."
+
 #define clr(%1) %1 == -1 ? random(256) : %1
 
 enum
 {
-	CMD_NULL = 0,
+	CMD_NULL,
 	CMD_TIMER,
-	CMD_STOP
+	CMD_STOP,
+	CMD_MAX
 }
 
 enum _:Settings
@@ -50,7 +61,7 @@ new g_eSettings[Settings]
 
 new Trie:g_tTimer,
 	Float:g_fSpeed,
-	g_iCmdLen[3],
+	g_iCmdLen[CMD_MAX],
 	g_iObject,
 	g_iTimer
 	
@@ -61,14 +72,16 @@ public plugin_init()
 	register_plugin("JB: Simon Counter", PLUGIN_VERSION, "OciXCrom")
 	register_cvar("CRXSimonCounter", PLUGIN_VERSION, FCVAR_SERVER|FCVAR_SPONLY|FCVAR_UNLOGGED)
 	register_dictionary("SimonCounter.txt")
+
 	register_logevent("StopTimer", 2, "1=Round_End")
 	register_logevent("StopTimer", 2, "0=World triggered", "1=Round_Start")
 	
 	register_clcmd("say", "OnSay")
 	register_clcmd("say_team", "OnSay")
-	register_concmd("jbcounter_reload", "ReloadCounter", ADMIN_RCON)
+
+	register_concmd("jbcounter_reload", "ReloadCounter", ADMIN_RCON, "-- reloads the Simon Counter settings")
 	
-	new szPrefix[32]
+	new szPrefix[CC_MAX_PREFIX_SIZE]
 	formatex(szPrefix, charsmax(szPrefix), "%L", LANG_SERVER, "JBTIMER_CHAT_PREFIX")
 	CC_SetPrefix(szPrefix)
 }
@@ -76,13 +89,17 @@ public plugin_init()
 public plugin_precache()
 {
 	g_tTimer = TrieCreate()
+
 	get_configsdir(g_szFileName, charsmax(g_szFileName))
-	formatex(g_szFileName, charsmax(g_szFileName), "%s/SimonCounter.ini", g_szFileName)
+	add(g_szFileName, charsmax(g_szFileName), "/SimonCounter.ini")
+
 	ReadFile()
 }
 
 public plugin_end()
+{
 	TrieDestroy(g_tTimer)
+}
 
 ReadFile(bReload = false)
 {
@@ -99,14 +116,16 @@ ReadFile(bReload = false)
 			
 			switch(szData[0])
 			{
-				case EOS, ';', '[': continue
+				case EOS, '#', ';', '[': continue
 				default:
 				{
 					strtok(szData, szKey, charsmax(szKey), szValue, charsmax(szValue), '=')
 					trim(szKey); trim(szValue)
 					
 					if(!szValue[0])
+					{
 						continue
+					}
 
 					if(equal(szKey, "TIMER_COMMAND"))
 					{
@@ -134,47 +153,78 @@ ReadFile(bReload = false)
 									TrieSetCell(g_tTimer, szNum, 1)
 								}
 							}
-							else TrieSetCell(g_tTimer, szKey, 1)
+							else
+							{
+								TrieSetCell(g_tTimer, szKey, 1)
+							}
 						}
 					}
 					else if(equal(szKey, "HIDE_COMMAND_IN_CHAT"))
+					{
 						g_eSettings[HIDE_COMMAND_IN_CHAT] = clamp(str_to_num(szValue), PLUGIN_CONTINUE, PLUGIN_HANDLED)
+					}
 					else if(equal(szKey, "CHAT_MESSAGES"))
+					{
 						g_eSettings[CHAT_MESSAGES] = bool:(clamp(str_to_num(szValue), false, true))
+					}
 					else if(equal(szKey, "TIMER_SPEED"))
+					{
 						g_eSettings[TIMER_SPEED] = _:floatclamp(str_to_float(szValue), 0.1, 10.0)
+					}
 					else if(equal(szKey, "SPEECH_PATH"))
+					{
 						copy(g_eSettings[SPEECH_PATH], charsmax(g_eSettings[SPEECH_PATH]), szValue)
+					}
 					else if(equal(szKey, "STOP_SOUND"))
 					{
 						copy(g_eSettings[STOP_SOUND], charsmax(g_eSettings[STOP_SOUND]), szValue)
 						
-						if(!bReload)
-							precache_sound(szValue)
+						if(!bReload && szValue[0])
+						{
+							precache_generic(szValue)
+						}
 					}
 					else if(equal(szKey, "TIMER_FOR_ADMINS"))
+					{
 						copy(g_eSettings[TIMER_FOR_ADMINS], charsmax(g_eSettings[TIMER_FOR_ADMINS]), szValue)
+					}
 					else if(equal(szKey, "HUD_USE_DHUD"))
 					{
 						g_eSettings[HUD_USE_DHUD] = bool:(clamp(str_to_num(szValue), false, true))
 						
 						if(!g_eSettings[HUD_USE_DHUD])
+						{
 							g_iObject = CreateHudSyncObj()
+						}
 					}
 					else if(equal(szKey, "HUD_RED"))
+					{
 						g_eSettings[HUD_RED] = clamp(str_to_num(szValue), -1, 255)
+					}
 					else if(equal(szKey, "HUD_GREEN"))
+					{
 						g_eSettings[HUD_GREEN] = clamp(str_to_num(szValue), -1, 255)
+					}
 					else if(equal(szKey, "HUD_BLUE"))
+					{
 						g_eSettings[HUD_BLUE] = clamp(str_to_num(szValue), -1, 255)
+					}
 					else if(equal(szKey, "HUD_X"))
+					{
 						g_eSettings[HUD_X] = _:floatclamp(str_to_float(szValue), -1.0, 1.0)
+					}
 					else if(equal(szKey, "HUD_Y"))
+					{
 						g_eSettings[HUD_Y] = _:floatclamp(str_to_float(szValue), -1.0, 1.0)
+					}
 					else if(equal(szKey, "HUD_EFFECTS"))
+					{
 						g_eSettings[HUD_EFFECTS] = clamp(str_to_num(szValue), 0, 2)
+					}
 					else if(equal(szKey, "HUD_FXTIME"))
+					{
 						g_eSettings[HUD_FXTIME] = _:floatclamp(str_to_float(szValue), 0.1, 10.0)
+					}
 				}
 			}
 		}
@@ -186,14 +236,18 @@ ReadFile(bReload = false)
 public ReloadCounter(id, iLevel, iCid)
 {
 	if(!cmd_access(id, iLevel, iCid, 1))
+	{
 		return PLUGIN_HANDLED
+	}
 	
 	ReadFile(true)
 	
 	new szName[32]
 	get_user_name(id, szName, charsmax(szName))
+
 	console_print(id, "%L", id, "JBTIMER_RELOADED")
 	log_amx("%L", LANG_SERVER, "JBTIMER_RELOADED_LOG", szName)
+
 	return PLUGIN_HANDLED
 }
 
@@ -204,27 +258,39 @@ public OnSay(id)
 	remove_quotes(szArgs)
 	
 	if(equali(szArgs[0], g_eSettings[TIMER_COMMAND], g_iCmdLen[CMD_TIMER]))
+	{
 		iCmd = CMD_TIMER
+	}
 	else if(equali(szArgs[0], g_eSettings[STOP_COMMAND], g_iCmdLen[CMD_STOP]))
+	{
 		iCmd = CMD_STOP
-	else return PLUGIN_CONTINUE
+	}
+	else
+	{
+		return PLUGIN_CONTINUE
+	}
 	
 	#if defined IS_SIMON
 	if(!IS_SIMON(id))
 	{
 		if(has_access(id))
+		{
 			goto @ALL_GOOD
+		}
 		
 		CC_SendMessage(id, "%L", id, "JBTIMER_NOT_SIMON")
-		return PLUGIN_TIMER
+		return g_eSettings[HIDE_COMMAND_IN_CHAT]
 	}
-	else goto @ALL_GOOD
+	else
+	{
+		goto @ALL_GOOD
+	}
 	#endif
 	
 	if(!has_access(id))
 	{
 		CC_SendMessage(id, "%L", id, "JBTIMER_NO_ACCESS")
-		return PLUGIN_TIMER
+		return g_eSettings[HIDE_COMMAND_IN_CHAT]
 	}
 	
 	#if defined IS_SIMON
@@ -239,13 +305,21 @@ public OnSay(id)
 			parse(szArgs, szArgs, charsmax(szArgs), szTime, charsmax(szTime), szSpeed, charsmax(szSpeed))
 			
 			if(!szTime[0])
+			{
 				CC_SendMessage(id, "%L", id, "JBTIMER_USAGE", g_eSettings[TIMER_COMMAND])
+			}
 			else if(!is_str_num(szTime))
+			{
 				CC_SendMessage(id, "%L", id, "JBTIMER_INVALID_TIMER", szTime)
+			}
 			else if(!TrieKeyExists(g_tTimer, szTime))
+			{
 				CC_SendMessage(id, "%L", id, "JBTIMER_INVALID_NUMBER", szTime)
+			}
 			else if(g_iTimer)
+			{
 				CC_SendMessage(id, "%L", id, "JBTIMER_ALREADY_ACTIVE", g_iTimer)
+			}
 			else
 			{
 				g_iTimer = str_to_num(szTime)
@@ -257,9 +331,13 @@ public OnSay(id)
 				if(g_eSettings[CHAT_MESSAGES])
 				{
 					if(g_fSpeed != g_eSettings[TIMER_SPEED])
+					{
 						CC_SendMessage(0, "%L", LANG_PLAYER, "JBTIMER_STARTED_SPEED", szName, g_iTimer, g_fSpeed)
+					}
 					else
+					{
 						CC_SendMessage(0, "%L", LANG_PLAYER, "JBTIMER_STARTED", szName, g_iTimer)
+					}
 				}
 				
 				set_task(g_fSpeed, "DisplayTimer", TASK_TIMER, .flags = "b")
@@ -269,7 +347,9 @@ public OnSay(id)
 		case CMD_STOP:
 		{
 			if(!g_iTimer)
+			{
 				CC_SendMessage(id, "%L", id, "JBTIMER_NOT_ACTIVE")
+			}
 			else
 			{
 				StopTimer()
@@ -279,12 +359,14 @@ public OnSay(id)
 				client_cmd(0, "spk %s", g_eSettings[STOP_SOUND])
 				
 				if(g_eSettings[CHAT_MESSAGES])
+				{
 					CC_SendMessage(0, "%L", LANG_PLAYER, "JBTIMER_STOPPED", szName)
+				}
 			}
 		}
 	}
 	
-	return PLUGIN_TIMER
+	return g_eSettings[HIDE_COMMAND_IN_CHAT]
 }
 
 public DisplayTimer()
@@ -317,12 +399,16 @@ public DisplayTimer()
 		remove_task(TASK_TIMER)
 		
 		if(g_eSettings[CHAT_MESSAGES])
+		{
 			set_task(g_fSpeed, "StopMessage")
+		}
 	}
 }
 
 public StopMessage()
+{
 	CC_SendMessage(0, "%L", LANG_PLAYER, "JBTIMER_TIMER_END")
+}
 
 public StopTimer()
 {
@@ -331,4 +417,6 @@ public StopTimer()
 }
 
 bool:has_access(id)
+{
 	return (g_eSettings[TIMER_FOR_ADMINS][0] && has_flag(id, g_eSettings[TIMER_FOR_ADMINS]))
+}
