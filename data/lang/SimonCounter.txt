@@ -14,8 +14,8 @@ JBTIMER_STOPPED = &x03%s &x01has stopped the timer!
 JBTIMER_TIMER_END = The time has ended!
 JBTIMER_RELOADED = You have reloaded the configuration.
 JBTIMER_RELOADED_LOG = %s has reloaded the configuration.
-JBTIMER_SECOND = Second
-JBTIMER_SECONDS = Seconds
+JBTIMER_SECOND = second
+JBTIMER_SECONDS = seconds
 
 [mk]
 JBTIMER_CHAT_PREFIX = &x04[JB Tajmer]&x01
@@ -33,8 +33,8 @@ JBTIMER_STOPPED = &x03%s &x01go zapra tajmerot!
 JBTIMER_TIMER_END = Tajmerot zavrshi!
 JBTIMER_RELOADED = Konfiguracijata e obnovena.
 JBTIMER_RELOADED_LOG = %s ja obnovi konfiguracijata.
-JBTIMER_SECOND = Sekunda
-JBTIMER_SECONDS = Sekundi
+JBTIMER_SECOND = sekunda
+JBTIMER_SECONDS = sekundi
 
 [bg]
 JBTIMER_CHAT_PREFIX = &x04[JB Taimer]&x01
@@ -52,5 +52,5 @@ JBTIMER_STOPPED = &x03%s &x01sprq taimera!
 JBTIMER_TIMER_END = Taimerut svurshi!
 JBTIMER_RELOADED = Konfiguraciqta e prezaredena.
 JBTIMER_RELOADED_LOG = %s prezaredi konfiguraciqta.
-JBTIMER_SECOND = Sekunda
-JBTIMER_SECONDS = Sekundi
+JBTIMER_SECOND = sekunda
+JBTIMER_SECONDS = sekundi
